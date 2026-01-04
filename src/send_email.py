@@ -161,10 +161,11 @@ def send_report():
     
     sender = os.environ.get("EMAIL_USER")
     pwd = os.environ.get("EMAIL_PASS")
-    recipient = os.environ.get("EMAIL_RECIPIENT", "leandro.lf.frazao@hotmail.com")
+    recipient = os.environ.get("EMAIL_RECIPIENT") or "leandro.lf.frazao@hotmail.com"
     
     if sender:
         try:
+            print(f"Enviando relatório para: {recipient}")
             yag = yagmail.SMTP(sender, pwd)
             yag.send(
                 to=recipient,
