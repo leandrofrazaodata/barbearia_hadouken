@@ -41,8 +41,11 @@ jobs:
           MOTHERDUCK_TOKEN: ${{ secrets.MOTHERDUCK_TOKEN }} # Python precisa para ler
           EMAIL_USER: ${{ secrets.EMAIL_USER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          # ... telegram vars ...
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_TOPIC_ID: "SEU_ID" # Se usar tópicos, altere aqui ou crie uma secret
         run: python src/send_email.py
 
       # Notificação de Falha Crítica
