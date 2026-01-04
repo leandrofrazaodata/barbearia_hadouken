@@ -1,7 +1,7 @@
-pandas
-dbt-duckdb
-duckdb
-yagmail
-openpyxl
-openai
-requests
+pandas==2.3.3
+dbt-duckdb==1.10.0
+duckdb==1.4.3
+yagmail==0.15.293
+openpyxl==3.1.5
+openai==2.14.0
+requests==2.32.5
