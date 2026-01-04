@@ -15,6 +15,6 @@ target-path: "target"
 clean-targets: ["target", "dbt_packages"]
 
 models:
-  barbearia_teste:
+  barbearia_hadouken:
     # Configura tudo como view por padrão (ou table se preferir)
     materialized: view
