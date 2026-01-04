@@ -1,0 +1,9 @@
+barbearia_hadouken:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      # O prefixo 'md:' avisa que é MotherDuck
+      # 'my_db' será o nome do banco lá na nuvem
+      path: 'md:barbearia_hadouken_db?token={{ env_var("MOTHERDUCK_TOKEN") }}' 
+      threads: 1
