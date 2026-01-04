@@ -11,7 +11,15 @@ SELECT
     v.venda_id,
     v.data_venda,
     -- Extraindo inteligência temporal
-    DAYNAME(v.data_venda) as dia_da_semana,
+    CASE strftime(v.data_venda, '%w')
+        WHEN '0' THEN 'Domingo'
+        WHEN '1' THEN 'Segunda'
+        WHEN '2' THEN 'Terça'
+        WHEN '3' THEN 'Quarta'
+        WHEN '4' THEN 'Quinta'
+        WHEN '5' THEN 'Sexta'
+        WHEN '6' THEN 'Sábado'
+    END as dia_da_semana,
     EXTRACT(HOUR FROM v.data_venda) as hora_do_dia,
     CASE 
         WHEN EXTRACT(HOUR FROM v.data_venda) < 12 THEN 'Manhã'
