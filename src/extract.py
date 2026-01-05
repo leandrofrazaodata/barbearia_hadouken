@@ -22,6 +22,10 @@ URL_VENDAS = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=c
 GID_PRECOS = "1977854161"
 URL_PRECOS = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={GID_PRECOS}"
 
+# Aba Metas
+GID_METAS = "1524491873"
+URL_METAS = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={GID_METAS}"
+
 def run_pipeline():
     print(">>> [1/4] Iniciando Ingestão e Infraestrutura...")
     
@@ -50,7 +54,8 @@ def run_pipeline():
     files = {
         "raw_clientes": URL_CLIENTES,
         "raw_vendas": URL_VENDAS,
-        "raw_precos": URL_PRECOS 
+        "raw_precos": URL_PRECOS,
+        "raw_metas": URL_METAS
     }
 
     for table_name, url in files.items():

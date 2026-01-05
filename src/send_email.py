@@ -13,7 +13,7 @@ CONFIG_CLIENTE = {
     "tom_de_voz": "Profissional e acolhedor."
 }
 
-def get_ai_analysis(metricas, top_bairro, historico_recente, top_horario, top_indicador):
+def get_ai_analysis(metricas, top_bairro, historico_recente, top_horario, top_indicador, meta_info):
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key: return "IA indisponível."
 
@@ -36,10 +36,13 @@ def get_ai_analysis(metricas, top_bairro, historico_recente, top_horario, top_in
     Melhor Horário: {top_horario}
     Top Indicador: {top_indicador}
     
+    SITUAÇÃO DA META:
+    {meta_info}
+    
     {txt_memoria}
     
     TAREFA:
-    Dê 1 insight tático NOVO e curto (máx 3 linhas) baseado nos dados.
+    Dê 1 insight tático NOVO e curto (máx 3 linhas) focado em COMO ATINGIR A META.
     """
 
     try:
@@ -107,12 +110,54 @@ def send_report():
         except:
             lista_memoria = []
 
+        # 4. Cálculo de Meta
+        try:
+            query_meta = """
+            SELECT meta FROM stg_metas 
+            WHERE mes = EXTRACT(MONTH FROM CURRENT_DATE) 
+              AND ano = EXTRACT(YEAR FROM CURRENT_DATE)
+            """
+            res_meta = con.execute(query_meta).fetchone()
+            meta_valor = float(res_meta[0]) if res_meta else 0.0
+            
+            faturamento_mes = float(metricas_ia['periodos']['Mês Atual']['valor'])
+            ticket_medio = float(metricas_ia['ticket_medio'])
+            
+            if meta_valor > 0:
+                percentual = (faturamento_mes / meta_valor) * 100
+                falta_valor = max(0, meta_valor - faturamento_mes)
+                cortes_restantes = int(falta_valor / ticket_medio) if ticket_medio > 0 else 0
+                
+                meta_info = f"Meta: R$ {meta_valor:.2f} | Atingido: {percentual:.1f}% | Falta: R$ {falta_valor:.2f} (~{cortes_restantes} cortes)"
+                
+                # HTML Progress Bar
+                cor_barra = "#4caf50" if percentual >= 100 else "#ff9800"
+                largura_barra = min(100, percentual)
+                html_meta = f"""
+                <tr><td colspan='3' style='padding:6px;border:1px solid #c9c9c9;background:#f9f9f9;'>
+                    <div style='margin-bottom:4px;font-weight:bold;font-size:12px;'>Meta do Mês: {percentual:.1f}%</div>
+                    <div style='background:#e0e0e0;border-radius:4px;height:10px;width:100%;'>
+                        <div style='background:{cor_barra};width:{largura_barra}%;height:10px;border-radius:4px;'></div>
+                    </div>
+                    <div style='font-size:10px;margin-top:4px;color:#555;'>
+                        Meta: R$ {meta_valor:.2f} • Falta: R$ {falta_valor:.2f} (~{cortes_restantes} cortes)
+                    </div>
+                </td></tr>
+                """
+            else:
+                meta_info = "Meta não definida para este mês."
+                html_meta = ""
+                
+        except Exception as e:
+            meta_info = f"Erro ao calcular meta: {e}"
+            html_meta = ""
+
     except Exception as e:
         send_telegram_alert(f"Erro SQL: {e}", level="error")
         raise e
 
     # 4. Gera Insight e Salva
-    insight = get_ai_analysis(metricas_ia, top_bairro, lista_memoria, top_horario, top_indicador)
+    insight = get_ai_analysis(metricas_ia, top_bairro, lista_memoria, top_horario, top_indicador, meta_info)
     try:
         json_metrics = json.dumps(metricas_ia)
         con.execute("INSERT INTO historico_ia (data_referencia, insight_gerado, metricas_json) VALUES (CURRENT_DATE, ?, ?)", [insight, json_metrics])
@@ -144,6 +189,7 @@ def send_report():
         "<strong>Consultor 3D:</strong>"
         f"<div style='font-style:italic;margin-top:2px;'>{insight}</div>"
         "</td></tr>"
+        f"{html_meta}"
         "<tr style='background:#0b3d91;color:#fff;font-weight:bold;'>"
         "<th style='padding:4px;border-top:1px solid #0b3d91;border-right:1px solid #ffffff;text-align:left;'>Período</th>"
         "<th style='padding:4px;border-top:1px solid #0b3d91;border-right:1px solid #ffffff;text-align:left;'>Fat. (R$)</th>"
@@ -170,7 +216,7 @@ def send_report():
             yag = yagmail.SMTP(sender, pwd)
             yag.send(
                 to=recipient,
-                subject=f"Relatório 3D - {datetime.now().strftime('%d/%m')}",
+                subject=f"📊 Relatório 3D - Barbearia Hadouken - {datetime.now().strftime('%d/%m')}",
                 contents=[yagmail.raw(html_body)]
             )
             print("Relatório enviado!")
