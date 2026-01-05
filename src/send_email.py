@@ -138,6 +138,7 @@ def send_report():
         "<table width='520' cellpadding='0' cellspacing='0' border='0' "
         "style='border-collapse:collapse;margin:0;font-family:Arial,sans-serif;font-size:11px;line-height:1.25;color:#101010;"
         "background:#ffffff;border:1px solid #0b3d91;mso-table-lspace:0pt;mso-table-rspace:0pt;'>"
+        "<tr><td colspan='3' style='text-align:center;background:#000;'><img src='https://i.pinimg.com/originals/1b/30/e8/1b30e8e7652ecd3a28dd46bdd8fac55a.gif' width='520' style='display:block;width:100%;max-width:520px;' alt='Hadouken'></td></tr>"
         f"<tr style='background:#0b3d91;color:#fff;font-weight:bold;text-align:center;'><td colspan='3' style='padding:6px;'>Resumo Gerencial • Barbearia Hadouken • {today_str}</td></tr>"
         "<tr><td colspan='3' style='padding:6px;border-top:1px solid #d7d7d7;background:#fff2bf;'>"
         "<strong>Consultor 3D:</strong>"

@@ -56,7 +56,8 @@ def run_pipeline():
     for table_name, url in files.items():
         try:
             print(f"Processando {table_name}...")
-            df = pd.read_csv(url, on_bad_lines='warn')
+            # Force all columns to be strings to avoid type inference issues (e.g. phone numbers as floats)
+            df = pd.read_csv(url, on_bad_lines='warn', dtype=str)
             
             if len(df.columns) > 0 and "<!DOCTYPE" in str(df.columns[0]):
                 raise Exception("ERRO: Link baixou HTML. Verifique o GID.")
